@@ -3,6 +3,14 @@
 import { useEffect, useMemo, useState } from "react";
 
 type LoreItem = { code: string; title: string; copy: string };
+type FeaturedBroadcast = {
+  title: string;
+  subtitle: string;
+  videoUrl: string;
+  posterUrl: string;
+  imageUrl: string;
+  audioUrl: string;
+};
 type SiteData = {
   status: string;
   eyebrow: string;
@@ -10,7 +18,7 @@ type SiteData = {
   heroCopy: string;
   characterUrl: string;
   contractAddress: string;
-  currentTrack: { title: string; subtitle: string; audioUrl: string };
+  featuredBroadcast: FeaturedBroadcast;
   lore: LoreItem[];
   socials: { x: string; telegram: string };
 };
@@ -22,7 +30,14 @@ const blank: SiteData = {
   heroCopy: "",
   characterUrl: "",
   contractAddress: "",
-  currentTrack: { title: "", subtitle: "", audioUrl: "" },
+  featuredBroadcast: {
+    title: "",
+    subtitle: "",
+    videoUrl: "",
+    posterUrl: "",
+    imageUrl: "",
+    audioUrl: "",
+  },
   lore: [],
   socials: { x: "", telegram: "" },
 };
@@ -43,10 +58,25 @@ export default function AdminConsole() {
   }, []);
 
   const dirtyLabel = useMemo(() => state === "saving" ? "SAVING…" : state === "saved" ? "SAVED" : "SAVE CHANGES", [state]);
+  const broadcast = data.featuredBroadcast;
+  const broadcastMode = broadcast.videoUrl
+    ? "VIDEO FIRST"
+    : broadcast.imageUrl && broadcast.audioUrl
+      ? "IMAGE + AUDIO FALLBACK"
+      : broadcast.audioUrl
+        ? "CHARACTER/POSTER + AUDIO"
+        : broadcast.imageUrl || broadcast.posterUrl
+          ? "VISUAL ONLY"
+          : "WAITING FOR MEDIA";
+  const previewImage = broadcast.imageUrl || broadcast.posterUrl || data.characterUrl;
 
   function field<K extends keyof SiteData>(key: K, value: SiteData[K]) {
     setData((current) => ({ ...current, [key]: value }));
     if (state === "saved") setState("ready");
+  }
+
+  function broadcastField<K extends keyof FeaturedBroadcast>(key: K, value: FeaturedBroadcast[K]) {
+    field("featuredBroadcast", { ...data.featuredBroadcast, [key]: value });
   }
 
   async function save() {
@@ -74,7 +104,7 @@ export default function AdminConsole() {
     <main>
       <header>
         <div><b>NEBUCHADREKTZAR</b><span>// ADMIN DESK</span></div>
-        <button onClick={save} disabled={state === "saving" || state === "error" && !data.heroTitle}>{dirtyLabel}</button>
+        <button onClick={save} disabled={state === "saving" || (state === "error" && !data.heroTitle)}>{dirtyLabel}</button>
       </header>
       <section className="intro">
         <p>ROYAL CONTENT CONTROL</p>
@@ -92,16 +122,32 @@ export default function AdminConsole() {
         </section>
 
         <section className="panel">
-          <div className="panel-title"><span>02</span><b>CHARACTER</b></div>
-          <label>NEBUFILES CHARACTER URL<input placeholder="https://..." value={data.characterUrl} onChange={(e) => field("characterUrl", e.target.value)} /></label>
-          <div className="hint">Upload the final art to Bunny NEBUFILES, then paste the served URL here. Direct upload comes after Bunny API credentials are wired.</div>
+          <div className="panel-title"><span>02</span><b>CHARACTER IDENTITY</b></div>
+          <label>NEBUFILES CHARACTER / LOGO URL<input placeholder="https://..." value={data.characterUrl} onChange={(e) => field("characterUrl", e.target.value)} /></label>
+          <div className="hint">This is the approved Fallen King identity image. It also becomes the last-resort visual fallback if a broadcast has no video, poster or featured still.</div>
         </section>
 
-        <section className="panel">
-          <div className="panel-title"><span>03</span><b>ROYAL BROADCAST</b></div>
-          <label>TRACK TITLE<input value={data.currentTrack.title} onChange={(e) => field("currentTrack", { ...data.currentTrack, title: e.target.value })} /></label>
-          <label>TRACK SUBTITLE<input value={data.currentTrack.subtitle} onChange={(e) => field("currentTrack", { ...data.currentTrack, subtitle: e.target.value })} /></label>
-          <label>NEBUFILES AUDIO URL<input placeholder="https://...mp3" value={data.currentTrack.audioUrl} onChange={(e) => field("currentTrack", { ...data.currentTrack, audioUrl: e.target.value })} /></label>
+        <section className="panel broadcast-panel">
+          <div className="panel-title"><span>03</span><b>FEATURED BROADCAST</b></div>
+          <div className="mode-line"><span>PUBLIC MODE</span><strong>{broadcastMode}</strong></div>
+          <label>TRACK / BROADCAST TITLE<input value={broadcast.title} onChange={(e) => broadcastField("title", e.target.value)} /></label>
+          <label>SUBTITLE / EPISODE<input value={broadcast.subtitle} onChange={(e) => broadcastField("subtitle", e.target.value)} /></label>
+          <label>NEBUFILES VIDEO URL — PREFERRED<input placeholder="https://...mp4" value={broadcast.videoUrl} onChange={(e) => broadcastField("videoUrl", e.target.value)} /></label>
+          <label>VIDEO POSTER URL<input placeholder="https://...jpg" value={broadcast.posterUrl} onChange={(e) => broadcastField("posterUrl", e.target.value)} /></label>
+          <label>FALLBACK FEATURE IMAGE URL<input placeholder="https://...jpg" value={broadcast.imageUrl} onChange={(e) => broadcastField("imageUrl", e.target.value)} /></label>
+          <label>FALLBACK AUDIO URL<input placeholder="https://...mp3" value={broadcast.audioUrl} onChange={(e) => broadcastField("audioUrl", e.target.value)} /></label>
+          <div className="hint">Priority is VIDEO → IMAGE + AUDIO → CHARACTER/POSTER + AUDIO → visual only. The video file should carry its own soundtrack; the separate audio URL is the fallback when video is unavailable.</div>
+
+          <div className="admin-preview">
+            <div className="preview-head"><span>PREVIEW</span><small>{broadcastMode}</small></div>
+            {broadcast.videoUrl ? (
+              <video key={broadcast.videoUrl} src={broadcast.videoUrl} poster={broadcast.posterUrl || previewImage || undefined} controls playsInline preload="metadata" />
+            ) : previewImage ? (
+              <img src={previewImage} alt="Featured broadcast preview" />
+            ) : (
+              <div className="preview-empty">NO BROADCAST MEDIA YET</div>
+            )}
+          </div>
         </section>
 
         <section className="panel wide">
