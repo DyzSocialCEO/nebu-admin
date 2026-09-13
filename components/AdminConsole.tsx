@@ -24,7 +24,7 @@ type SiteData = {
 };
 
 const blank: SiteData = {
-  status: "GRAZING",
+  status: "STILL EARLY",
   eyebrow: "",
   heroTitle: "",
   heroCopy: "",
@@ -114,29 +114,30 @@ export default function AdminConsole() {
 
       <div className="grid">
         <section className="panel wide">
-          <div className="panel-title"><span>01</span><b>PUBLIC FACE</b></div>
+          <div className="panel-title"><span>01</span><b>HOW HE ENTERS THE ROOM</b></div>
           <label>STATE<input value={data.status} onChange={(e) => field("status", e.target.value)} /></label>
           <label>EYEBROW<input value={data.eyebrow} onChange={(e) => field("eyebrow", e.target.value)} /></label>
-          <label>HEADLINE<textarea rows={2} value={data.heroTitle} onChange={(e) => field("heroTitle", e.target.value)} /></label>
+          <label>DEFAULT HEADLINE<textarea rows={2} value={data.heroTitle} onChange={(e) => field("heroTitle", e.target.value)} /></label>
           <label>ONE-LINER<textarea rows={3} value={data.heroCopy} onChange={(e) => field("heroCopy", e.target.value)} /></label>
+          <div className="hint">Public rule: NEBU speaks for himself. Do not explain the Bible reference, his biography or why the joke works.</div>
         </section>
 
         <section className="panel">
-          <div className="panel-title"><span>02</span><b>CHARACTER IDENTITY</b></div>
+          <div className="panel-title"><span>02</span><b>THE KING</b></div>
           <label>NEBUFILES CHARACTER / LOGO URL<input placeholder="https://..." value={data.characterUrl} onChange={(e) => field("characterUrl", e.target.value)} /></label>
-          <div className="hint">This is the approved Fallen King identity image. It also becomes the last-resort visual fallback if a broadcast has no video, poster or featured still.</div>
+          <div className="hint">Use the approved Fallen King identity. His face and character stay consistent across the site, covers and future videos.</div>
         </section>
 
         <section className="panel broadcast-panel">
-          <div className="panel-title"><span>03</span><b>FEATURED BROADCAST</b></div>
+          <div className="panel-title"><span>03</span><b>NEW MASTERPIECE</b></div>
           <div className="mode-line"><span>PUBLIC MODE</span><strong>{broadcastMode}</strong></div>
           <label>TRACK / BROADCAST TITLE<input value={broadcast.title} onChange={(e) => broadcastField("title", e.target.value)} /></label>
-          <label>SUBTITLE / EPISODE<input value={broadcast.subtitle} onChange={(e) => broadcastField("subtitle", e.target.value)} /></label>
+          <label>NEBU'S INTRO LINE<input value={broadcast.subtitle} onChange={(e) => broadcastField("subtitle", e.target.value)} /></label>
           <label>NEBUFILES VIDEO URL — PREFERRED<input placeholder="https://...mp4" value={broadcast.videoUrl} onChange={(e) => broadcastField("videoUrl", e.target.value)} /></label>
           <label>VIDEO POSTER URL<input placeholder="https://...jpg" value={broadcast.posterUrl} onChange={(e) => broadcastField("posterUrl", e.target.value)} /></label>
-          <label>FALLBACK FEATURE IMAGE URL<input placeholder="https://...jpg" value={broadcast.imageUrl} onChange={(e) => broadcastField("imageUrl", e.target.value)} /></label>
-          <label>FALLBACK AUDIO URL<input placeholder="https://...mp3" value={broadcast.audioUrl} onChange={(e) => broadcastField("audioUrl", e.target.value)} /></label>
-          <div className="hint">Priority is VIDEO → IMAGE + AUDIO → CHARACTER/POSTER + AUDIO → visual only. The video file should carry its own soundtrack; the separate audio URL is the fallback when video is unavailable.</div>
+          <label>FEATURE IMAGE URL<input placeholder="https://...jpg" value={broadcast.imageUrl} onChange={(e) => broadcastField("imageUrl", e.target.value)} /></label>
+          <label>AUDIO URL<input placeholder="https://...mp3" value={broadcast.audioUrl} onChange={(e) => broadcastField("audioUrl", e.target.value)} /></label>
+          <div className="hint">The public page treats music like something NEBU made and is forcing everybody to appreciate — not like a generic embedded streaming card.</div>
 
           <div className="admin-preview">
             <div className="preview-head"><span>PREVIEW</span><small>{broadcastMode}</small></div>
@@ -151,25 +152,27 @@ export default function AdminConsole() {
         </section>
 
         <section className="panel wide">
-          <div className="panel-title"><span>04</span><b>THE INCIDENT</b></div>
+          <div className="panel-title"><span>04</span><b>OLDER MASTERPIECES</b></div>
+          <div className="hint">These become the older-record rows under the current release. Keep each description short and in NEBU's voice.</div>
           <div className="lore-editor">
             {data.lore.map((item, i) => (
               <div className="lore-item" key={i}>
-                <label>CODE<input value={item.code} onChange={(e) => updateLore(i, "code", e.target.value)} /></label>
-                <label>TITLE<input value={item.title} onChange={(e) => updateLore(i, "title", e.target.value)} /></label>
-                <label>COPY<textarea rows={4} value={item.copy} onChange={(e) => updateLore(i, "copy", e.target.value)} /></label>
+                <label>LABEL<input value={item.code} onChange={(e) => updateLore(i, "code", e.target.value)} /></label>
+                <label>TRACK TITLE<input value={item.title} onChange={(e) => updateLore(i, "title", e.target.value)} /></label>
+                <label>NEBU'S COMMENT<textarea rows={4} value={item.copy} onChange={(e) => updateLore(i, "copy", e.target.value)} /></label>
               </div>
             ))}
           </div>
         </section>
 
         <section className="panel">
-          <div className="panel-title"><span>05</span><b>TOKEN</b></div>
+          <div className="panel-title"><span>05</span><b>SUPPORT THE ARTS</b></div>
           <label>CONTRACT ADDRESS<input value={data.contractAddress} onChange={(e) => field("contractAddress", e.target.value)} /></label>
+          <div className="hint">Token stays secondary. The joke is that the handlers added fundraising while NEBU continues behaving like a wealthy king.</div>
         </section>
 
         <section className="panel">
-          <div className="panel-title"><span>06</span><b>SOCIALS</b></div>
+          <div className="panel-title"><span>06</span><b>WHERE HE YELLS ONLINE</b></div>
           <label>X URL<input value={data.socials.x} onChange={(e) => field("socials", { ...data.socials, x: e.target.value })} /></label>
           <label>TELEGRAM URL<input value={data.socials.telegram} onChange={(e) => field("socials", { ...data.socials, telegram: e.target.value })} /></label>
         </section>
